@@ -21,7 +21,9 @@ abstract class AppModule {
         @Provides
         @Singleton
         fun provideDatabase(@ApplicationContext context: Context): AppDatabase {
-            return Room.databaseBuilder(context, AppDatabase::class.java, "app_db").build()
+            return Room.databaseBuilder(context, AppDatabase::class.java, "app_db")
+                .addMigrations(AppDatabase.MIGRATION_1_2)
+                .build()
         }
 
         @Provides
