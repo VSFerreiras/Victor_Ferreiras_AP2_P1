@@ -7,5 +7,6 @@ interface EntradaRepository {
     suspend fun upsert(entrada: Entrada)
     fun observeAll(): Flow<List<Entrada>>
     suspend fun getById(id: Int): Entrada?
+    suspend fun getByNombres(nombreCliente: String): Entrada?
     suspend fun delete(entrada: Entrada)
 }
