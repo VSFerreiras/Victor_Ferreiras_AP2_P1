@@ -25,7 +25,11 @@ class EntradaRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getById(id: Int): Entrada? {
-        return null
+        return dao.getById(id.toLong())?.toDomain()
+    }
+
+    override suspend fun getByNombres(nombreCliente: String): Entrada? {
+        return dao.getByNombres(nombreCliente)?.toDomain()
     }
 
     override suspend fun delete(entrada: Entrada) {

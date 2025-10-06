@@ -6,7 +6,7 @@ import ucne.edu.Victor_Ferreiras_AP2_P1.domain.model.Entrada
 fun EntradaEntity.toDomain(): Entrada {
     return Entrada(
         id = IdEntrada.toInt(),
-        fecha = "",
+        fecha = Fecha,
         nombreCliente = NombreCliente,
         cantidad = Cantidad,
         precio = Precio.toDouble()
@@ -16,6 +16,7 @@ fun EntradaEntity.toDomain(): Entrada {
 fun Entrada.toEntity(): EntradaEntity {
     return EntradaEntity(
         IdEntrada = id.toLong(),
+        Fecha = fecha,
         NombreCliente = nombreCliente,
         Cantidad = cantidad,
         Precio = precio.toInt()

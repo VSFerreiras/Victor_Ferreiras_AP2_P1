@@ -4,14 +4,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -27,22 +24,20 @@ fun EditScreen(
     onSavedNavigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         viewModel.events.collectLatest { event ->
             when (event) {
                 is EditUiEvent.Saved -> onSavedNavigateBack()
-                is EditUiEvent.ShowError -> snackbarHostState.showSnackbar(event.message)
             }
         }
     }
 
-    Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) { padding ->
+    Scaffold { padding ->
         EditScreenContent(
             modifier = Modifier.padding(padding),
             entrada = uiState.entrada,
-            errorMessage = if (uiState.error.isBlank()) null else uiState.error,
+            errorMessage = uiState.error,
             saving = uiState.saving,
             onFechaChange = viewModel::onFechaChange,
             onNombreClienteChange = viewModel::onNombreClienteChange,
@@ -57,7 +52,7 @@ fun EditScreen(
 fun EditScreenContent(
     modifier: Modifier = Modifier,
     entrada: Entrada,
-    errorMessage: String? = null,
+    errorMessage: String,
     saving: Boolean = false,
     onFechaChange: (String) -> Unit,
     onNombreClienteChange: (String) -> Unit,
@@ -80,10 +75,21 @@ fun EditScreenContent(
                 .padding(bottom = 24.dp)
         )
 
+        if (errorMessage.isNotBlank()) {
+            Text(
+                text = errorMessage,
+                color = androidx.compose.material3.MaterialTheme.colorScheme.error,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            )
+        }
+
         OutlinedTextField(
             value = entrada.fecha,
             onValueChange = onFechaChange,
-            label = { Text("Fecha (YYYY-MM-DD)") },
+            label = { Text("Fecha (DD-MM-YYYY)") },
+            isError = errorMessage.contains("fecha", ignoreCase = true),
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(12.dp))
@@ -91,6 +97,8 @@ fun EditScreenContent(
             value = entrada.nombreCliente,
             onValueChange = onNombreClienteChange,
             label = { Text("Nombre cliente") },
+            isError = errorMessage.contains("nombre", ignoreCase = true) ||
+                    errorMessage.contains("cliente", ignoreCase = true),
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(12.dp))
@@ -98,6 +106,7 @@ fun EditScreenContent(
             value = if (entrada.cantidad == 0) "" else entrada.cantidad.toString(),
             onValueChange = onCantidadChange,
             label = { Text("Cantidad") },
+            isError = errorMessage.contains("cantidad", ignoreCase = true),
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(12.dp))
@@ -105,6 +114,7 @@ fun EditScreenContent(
             value = if (entrada.precio == 0.0) "" else entrada.precio.toString(),
             onValueChange = onPrecioChange,
             label = { Text("Precio") },
+            isError = errorMessage.contains("precio", ignoreCase = true),
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(24.dp))
@@ -115,24 +125,16 @@ fun EditScreenContent(
         ) {
             Text(text = if (saving) "Guardando..." else "Guardar")
         }
-        errorMessage?.let {
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                text = it,
-                color = androidx.compose.material3.MaterialTheme.colorScheme.error,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun EditScreenPreview() {
-    val sample = Entrada(id = 0, fecha = "2025-10-01", nombreCliente = "Cliente Ejemplo", cantidad = 5, precio = 12.5)
+    val sample = Entrada(id = 0, fecha = "10-01-2025", nombreCliente = "Cliente Ejemplo", cantidad = 5, precio = 12.5)
     EditScreenContent(
         entrada = sample,
-        errorMessage = null,
+        errorMessage = "• Fecha requerida\n• Cliente requerido",
         saving = false,
         onFechaChange = {},
         onNombreClienteChange = {},

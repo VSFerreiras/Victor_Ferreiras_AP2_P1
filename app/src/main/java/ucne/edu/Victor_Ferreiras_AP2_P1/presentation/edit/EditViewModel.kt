@@ -29,8 +29,8 @@ class EditViewModel @Inject constructor(
     val events = _events.asSharedFlow()
 
     init {
-        val id = savedStateHandle.get<String>("entradaId")?.toIntOrNull()
-        if (id != null) {
+        val id = savedStateHandle.get<Int>("entradaId")
+        if (id != null && id > 0) {
             viewModelScope.launch {
                 val entrada = getEntradaUseCase(id)
                 if (entrada != null) {
@@ -63,10 +63,12 @@ class EditViewModel @Inject constructor(
             val entrada = _uiState.value.entrada
             val validation = validateEntradaUseCase(entrada)
             if (!validation.successful) {
-                _events.emit(EditUiEvent.ShowError(validation.errorMessage))
+                _uiState.value = _uiState.value.copy(
+                    error = validation.errorMessages.joinToString("\n• ", "• ")
+                )
                 return@launch
             }
-            _uiState.value = _uiState.value.copy(saving = true)
+            _uiState.value = _uiState.value.copy(saving = true, error = "")
             upsertEntradaUseCase(entrada)
             _uiState.value = _uiState.value.copy(saving = false)
             _events.emit(EditUiEvent.Saved)
