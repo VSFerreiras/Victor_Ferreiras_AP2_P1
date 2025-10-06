@@ -29,8 +29,8 @@ class EditViewModel @Inject constructor(
     val events = _events.asSharedFlow()
 
     init {
-        val id = savedStateHandle.get<String>("entradaId")?.toIntOrNull()
-        if (id != null) {
+        val id = savedStateHandle.get<Int>("entradaId")
+        if (id != null && id > 0) {
             viewModelScope.launch {
                 val entrada = getEntradaUseCase(id)
                 if (entrada != null) {
