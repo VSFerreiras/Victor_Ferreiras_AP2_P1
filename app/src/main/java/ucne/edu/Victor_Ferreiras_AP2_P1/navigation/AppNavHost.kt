@@ -1,7 +1,6 @@
 package ucne.edu.Victor_Ferreiras_AP2_P1.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -22,15 +21,29 @@ fun AppNavHost() {
         composable(Screens.List.route) {
             ListScreen(
                 onAddClick = {
-                    navController.navigate(Screens.Edit.route)
+                    navController.navigate(Screens.Edit.createRoute())
                 },
-                onEditClick = {
-                    navController.navigate(Screens.Edit.route)
+                onEditClick = { entradaId ->
+                    navController.navigate(Screens.Edit.createRoute(entradaId))
                 }
             )
         }
 
-        composable(Screens.Edit.route) {
+        composable(Screens.Edit.createRoute()) {
+            EditScreen(
+                onSavedNavigateBack = {
+                    navController.popBackStack(
+                        route = Screens.List.route,
+                        inclusive = false
+                    )
+                }
+            )
+        }
+
+        composable(
+            route = "edit/{entradaId}",
+            arguments = listOf(navArgument("entradaId") { type = NavType.IntType })
+        ) { backStackEntry ->
             EditScreen(
                 onSavedNavigateBack = {
                     navController.popBackStack(
