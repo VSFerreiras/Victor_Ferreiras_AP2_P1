@@ -8,7 +8,6 @@ import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
-
 @Dao
 interface EntradaDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
@@ -19,6 +18,9 @@ interface EntradaDao {
 
     @Delete
     suspend fun delete(EntradaHuacales: EntradaEntity)
+
+    @Query("SELECT * FROM EntradaHuacales WHERE IdEntrada = :id")
+    suspend fun getById(id: Long): EntradaEntity?
 
     @Query("SELECT * FROM EntradaHuacales WHERE LOWER(NombreCliente) = LOWER(:nombres) LIMIT 1")
     suspend fun getByNombres(nombres: String): EntradaEntity?
