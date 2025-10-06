@@ -83,7 +83,7 @@ fun EditScreenContent(
         OutlinedTextField(
             value = entrada.fecha,
             onValueChange = onFechaChange,
-            label = { Text("Fecha (YYYY-MM-DD)") },
+            label = { Text("Fecha (DD-MM-YYYY)") },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(12.dp))
@@ -129,7 +129,7 @@ fun EditScreenContent(
 @Preview(showBackground = true)
 @Composable
 fun EditScreenPreview() {
-    val sample = Entrada(id = 0, fecha = "2025-10-01", nombreCliente = "Cliente Ejemplo", cantidad = 5, precio = 12.5)
+    val sample = Entrada(id = 0, fecha = "10-01-2025", nombreCliente = "Cliente Ejemplo", cantidad = 5, precio = 12.5)
     EditScreenContent(
         entrada = sample,
         errorMessage = null,
